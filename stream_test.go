@@ -158,6 +158,19 @@ func TestExactMedian(t *testing.T) {
 	}
 }
 
+func TestRange(t *testing.T) {
+	assert := assert.New(t)
+	cases := []Expectation{
+		{4, []float64{2, 3, 4, 4, 5, 2, 6}},
+		{10, []float64{11, 1, 4, 8, 10, 6}},
+	}
+
+	for _, c := range cases {
+		fi := NewFloatIndexFromSlice(c.data)
+		assert.Equal(c.expected, fi.Range())
+	}
+}
+
 func TestMode(t *testing.T) {
 	assert := assert.New(t)
 	cases := []Expectation{

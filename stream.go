@@ -68,6 +68,10 @@ func (fi *FloatIndex) String() string {
 	return s
 }
 
+func (fi *FloatIndex) GoString() string {
+	return fi.String()
+}
+
 // Prints the ordered set of values in the struct
 func (fi *FloatIndex) StringOrder() string {
 	return fmt.Sprint(fi.order)
@@ -145,6 +149,11 @@ func (fi *FloatIndex) ExactMedian() float64 {
 		}
 	}
 	return -1
+}
+
+// The range stat
+func (fi *FloatIndex) Range() float64 {
+	return fi.Max() - fi.Min()
 }
 
 // Finds the mode of the set
