@@ -27,7 +27,16 @@ func NewFloatIndex() *FloatIndex {
 	return &fi
 }
 
-/// STRUCT IMPLEMENTATION
+// Constructor
+func NewFloatIndexFromSlice(data []float64) *FloatIndex {
+	fi := NewFloatIndex()
+	for _, v := range data {
+		fi.Put(v)
+	}
+	return fi
+}
+
+/// STRUCT IMPLEMENTATION ///
 
 // Adds a value to the index
 func (fi *FloatIndex) Put(f float64) {
@@ -59,6 +68,11 @@ func (fi *FloatIndex) String() string {
 	return s
 }
 
+// Prints the ordered set of values in the struct
+func (fi *FloatIndex) StringOrder() string {
+	return fmt.Sprint(fi.order)
+}
+
 // Returns the grand total of numbers inserted into the struct
 func (fi *FloatIndex) CountTotal() int {
 	return fi.count
@@ -67,11 +81,6 @@ func (fi *FloatIndex) CountTotal() int {
 // Returns the count of unique numbers placed into the struct
 func (fi *FloatIndex) CountUnique() int {
 	return len(fi.order)
-}
-
-// Prints the ordered set of values in the struct
-func (fi *FloatIndex) StringOrder() string {
-	return fmt.Sprint(fi.order)
 }
 
 // Minimum by value, not number of occurences
@@ -95,8 +104,12 @@ func (fi *FloatIndex) Mean() float64 {
 }
 
 // Median of the values
+// Not 100% accurate in the case of small data sets with an even number of
+// elements. In that case you should average the two middle values, instead
+// this one simply chooses the larger. Will have little to not effect on
+// large data sets with many values, for perfect accuracy use ExactMedian()
 func (fi *FloatIndex) Median() float64 {
-	mid := fi.count / 2
+	mid := (fi.count / 2) + 1
 	i := 0
 	for _, v := range fi.order {
 		i += fi.index[v]
@@ -105,4 +118,43 @@ func (fi *FloatIndex) Median() float64 {
 		}
 	}
 	return -1
+}
+
+// Finds the exact median when total accuracy is needed.
+func (fi *FloatIndex) ExactMedian() float64 {
+	var even bool
+	var mid int
+	if fi.count%2 == 0 {
+		even = true
+		mid = fi.count / 2
+	} else {
+		even = false
+		mid = (fi.count / 2) + 1
+	}
+	k := 0
+	for i, v := range fi.order {
+		for j := 0; j < fi.index[v]; j++ {
+			k++
+			if k == mid {
+				if even {
+					return (fi.order[i] + fi.order[i+1]) / 2
+				} else {
+					return v
+				}
+			}
+		}
+	}
+	return -1
+}
+
+// Finds the mode of the set
+func (fi *FloatIndex) Mode() float64 {
+	maxkey := float64(0)
+	maxval := 0
+	for k, v := range fi.index {
+		if v > maxval {
+			maxkey, maxval = k, v
+		}
+	}
+	return maxkey
 }
